@@ -16,7 +16,11 @@ docker build -t oc-argocd-cli -f docker/Dockerfile .
 
 ```
 oc project openshift
+```
+```
 oc new-build oc-argocd-cli --binary --strategy docker
+```
+```
 oc start-build argocd-oc --from-dir docker
 ```
 
@@ -25,11 +29,14 @@ En este procedimiento, se creará una service account en Openshift y además un 
 
 ```
 oc project openshift-gitops
-
+```
+```
 oc create sa argo-sync
-
+```
+```
 oc apply -f templates/role.yaml
-
+```
+```
 oc adm policy add-role-to-user argo-sync system:serviceaccount:openshift-gitops:argo-sync
 ``` 
 
@@ -63,20 +70,24 @@ Una vez dentro del contenedor, procedemos a ejecutar los siguientes comandos:
 
 ```
 export ARGOCD_REPO_SERVER_NAME=openshift-gitops-repo-server
-
 export SA_TOKEN=<saToken>
 export URL_API_OCP=<urlApiOpenshift>
 export URL_ARGOCD=<urlArgoServer>
 export APP_NAME=<appName>
-
+```
+```
 oc login --token=${SA_TOKEN} --server=${URL_API_OCP}
-
+```
+```
 kubectl config set-context --current --namespace=openshift-gitops
-
+```
+```
 argocd login ${URL_ARGOCD} --core
-
+```
+```
 argocd app sync ${APP_NAME} 
-
+```
+```
 argocd app wait ${APP_NAME} --health
 ```
 
