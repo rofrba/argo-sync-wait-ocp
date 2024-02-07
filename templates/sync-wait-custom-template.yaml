@@ -1,0 +1,50 @@
+apiVersion: template.openshift.io/v1
+kind: Template 
+metadata:
+  name: sync-wait-custom-template
+  namespace: openshift
+  annotations:
+    description: Template para aprovisionar clusterTask sync&wait
+parameters:
+  - name: SA_TOKEN
+    required: true
+  - name: URL_API_OCP
+    required: true
+objects:
+- apiVersion: tekton.dev/v1beta1
+  kind: ClusterTask
+  metadata:
+    name: sync-wait-custom
+  spec:
+    params:
+      - name: appName
+        type: string
+      - name: argocdServer
+        type: string
+      - name: openshiftApiUrl
+        type: string
+        value: ${URL_API_OCP}
+      - name: saToken
+        value: $(SA_TOKEN)
+    steps:
+      - image: 'image-registry.openshift-image-registry.svc:5000/openshift/argocd-oc:latest'
+        name: 'sync-wait'
+        resources: {}
+        script: >
+          #!/usr/bin/env bash
+
+          export ARGOCD_REPO_SERVER_NAME=openshift-gitops-repo-server
+
+          oc login --insecure-skip-tls-verify
+          --token="$(params.saToken)"
+          --server="$(params.openshiftApiUrl)"
+
+          kubectl config set-context --current --namespace=openshift-gitops
+
+          argocd login
+          "$(params.argocdServer)" --core 
+
+
+          argocd app sync "$(params.appName)" 
+
+          argocd app wait "$(params.appName)" --health

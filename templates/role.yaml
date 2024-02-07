@@ -1,0 +1,52 @@
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: argo-sync
+  namespace: openshift-gitops
+rules:
+  - verbs:
+      - list
+    apiGroups:
+      - ''
+    resources:
+      - configmaps
+      - secrets
+      - pods
+  - verbs:
+      - get
+    apiGroups:
+      - ''
+    resources:
+      - configmaps
+  - verbs:
+      - get
+    apiGroups:
+      - argoproj.io
+    resources:
+      - appprojects
+      - applications
+  - verbs:
+      - list
+    apiGroups:
+      - argoproj.io
+    resources:
+      - applications
+      - appprojects
+  - verbs:
+      - create
+    apiGroups:
+      - ''
+    resources:
+      - pods/portforward
+  - verbs:
+      - update
+    apiGroups:
+      - argoproj.io
+    resources:
+      - applications
+  - verbs:
+      - create
+    apiGroups:
+      - ''
+    resources:
+      - events
